@@ -16,8 +16,7 @@ import java.util.*;
 
 public class GameView extends View {
 
-    protected ArrayList<Integer> xCoords = new ArrayList<Integer>();
-    protected ArrayList<Integer> yCoords = new ArrayList<Integer>();
+    protected ArrayList<Point> Coords = new ArrayList<Point>();
 
     protected ArrayList<Point[]> segments = new ArrayList<Point[]>();
     private Point firstPoint;
@@ -125,12 +124,12 @@ public class GameView extends View {
 
         // draws the stroke
         if (isValidStroke) {
-            if (yCoords.size() > 1) {
-                for (int i = 0; i < xCoords.size()-1; i++) {
-                    int x1 = xCoords.get(i);
-                    int y1 = yCoords.get(i);
-                    int x2 = xCoords.get(i+1);
-                    int y2 = yCoords.get(i+1);
+            if (Coords.size() > 1) {
+                for (int i = 0; i < Coords.size()-1; i++) {
+                    int x1 = Coords.get(i).x;
+                    int y1 = Coords.get(i).y;
+                    int x2 = Coords.get(i+1).x;
+                    int y2 = Coords.get(i+1).y;
 
                     paint.setColor(Color.YELLOW);
                     paint.setStrokeWidth(10);
@@ -266,8 +265,7 @@ public class GameView extends View {
                     // upper-left corner of the little red box but we want the center
                     p.x = mapPoints[i].x+10;
                     p.y = mapPoints[i].y+10;
-                    xCoords.add(p.x);
-                    yCoords.add(p.y);
+                    Coords.add(p);
                     firstPoint = p;
                     isValidStroke = true;
                     break;
@@ -276,15 +274,13 @@ public class GameView extends View {
         }
         else if (event.getAction() == MotionEvent.ACTION_MOVE) {
             if (isValidStroke) {
-                xCoords.add(p.x);
-                yCoords.add(p.y);
+                Coords.add(p);
             }
         }
         else if (event.getAction() == MotionEvent.ACTION_UP) {
             if (isValidStroke) {
 
-                xCoords.clear();
-                yCoords.clear();
+                Coords.clear();
                 // only add the segment if the release point is within 30 of any of the other points
                 for (int i = 0; i < mapPoints.length; i++) {
                     double dx = p.x - mapPoints[i].x;
