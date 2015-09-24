@@ -55,6 +55,12 @@ public class GameView extends View {
         init();
     }
 
+    public void setNumLocations(int locations)
+    {
+        spinnerNum = locations;
+        invalidate();
+    }
+
     public static double calculatePathDistance(ArrayList<Point> points) {
 
         double total = 0;
@@ -81,7 +87,8 @@ public class GameView extends View {
     }
 
     protected void init() {
-        spinnerNum = MainActivity.numLocations;
+        //spinnerNum = MainActivity.numLocations;
+        //spinnerNum = 1;
 
         setBackgroundResource(R.drawable.campus);
 

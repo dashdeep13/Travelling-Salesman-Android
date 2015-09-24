@@ -2,6 +2,7 @@ package edu.upenn.cis573.travelingsalesman;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.content.Intent;
 import android.widget.ArrayAdapter;
@@ -33,6 +34,8 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
      */
     public void onButtonClick(View button) {
         Intent i = new Intent(this, GameActivity.class);
+        i.putExtra("numLocations",numLocations);
+        //Log.v("RESULT", "" + numLocations);
         startActivity(i);
     }
 

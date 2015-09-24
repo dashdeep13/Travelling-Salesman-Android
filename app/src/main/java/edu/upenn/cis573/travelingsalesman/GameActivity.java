@@ -1,7 +1,9 @@
 package edu.upenn.cis573.travelingsalesman;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -12,7 +14,14 @@ public class GameActivity extends android.support.v7.app.ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.play_game);
+        // Sending the value of numLocations to GameView
+        GameView gv = (GameView)findViewById(R.id.gameView);
+        Intent currentIntent = getIntent();
+        int numLocations = currentIntent.getIntExtra("numLocations",0);
+        gv.setNumLocations(numLocations);
+
     }
 
 
