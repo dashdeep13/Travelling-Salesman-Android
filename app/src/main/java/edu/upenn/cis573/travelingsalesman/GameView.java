@@ -16,7 +16,7 @@ import java.util.*;
 
 public class GameView extends View {
 
-    protected ArrayList<Point> Coords = new ArrayList<Point>();
+    protected Stroke stroke = new Stroke();
 
     protected ArrayList<Point[]> segments = new ArrayList<Point[]>();
     private Point firstPoint;
@@ -121,18 +121,17 @@ public class GameView extends View {
      */
     protected void onDraw(Canvas canvas) {
         Paint paint = new Paint();
-
         // draws the stroke
-        if (isValidStroke) {
-            if (Coords.size() > 1) {
-                for (int i = 0; i < Coords.size()-1; i++) {
-                    int x1 = Coords.get(i).x;
-                    int y1 = Coords.get(i).y;
-                    int x2 = Coords.get(i+1).x;
-                    int y2 = Coords.get(i+1).y;
+        if (stroke.isValidStroke()) {
+            if (stroke.getStrokeSize() > 1) {
+                for (int i = 0; i < stroke.getStrokeSize()-1; i++) {
+                    int x1 = stroke.getPointAtIndex(i).x;
+                    int y1 = stroke.getPointAtIndex(i).y;
+                    int x2 = stroke.getPointAtIndex(i+1).x;
+                    int y2 = stroke.getPointAtIndex(i + 1).y;
 
-                    paint.setColor(Color.YELLOW);
-                    paint.setStrokeWidth(10);
+                    paint.setColor(stroke.color);
+                    paint.setStrokeWidth(stroke.width);
                     canvas.drawLine(x1, y1, x2, y2, paint);
                 }
             }
@@ -265,22 +264,23 @@ public class GameView extends View {
                     // upper-left corner of the little red box but we want the center
                     p.x = mapPoints[i].x+10;
                     p.y = mapPoints[i].y+10;
-                    Coords.add(p);
+                    stroke.addPoint(p);
                     firstPoint = p;
+                    stroke.setValidStroke(true);
                     isValidStroke = true;
                     break;
                 }
             }
         }
         else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (isValidStroke) {
-                Coords.add(p);
+            if (stroke.isValidStroke()) {
+                stroke.addPoint(p);
             }
         }
         else if (event.getAction() == MotionEvent.ACTION_UP) {
             if (isValidStroke) {
 
-                Coords.clear();
+                stroke.clearPoints();
                 // only add the segment if the release point is within 30 of any of the other points
                 for (int i = 0; i < mapPoints.length; i++) {
                     double dx = p.x - mapPoints[i].x;
@@ -300,6 +300,7 @@ public class GameView extends View {
                 }
             }
             isValidStroke = false;
+            stroke.setValidStroke(false);
         }
         else {
             return false;
