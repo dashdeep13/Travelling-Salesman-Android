@@ -58,7 +58,7 @@ public class GameView extends View {
     public void setNumLocations(int locations)
     {
         spinnerNum = locations;
-        invalidate();
+        setMapPoints();
     }
 
     public static double calculatePathDistance(ArrayList<Point> points) {
@@ -86,17 +86,16 @@ public class GameView extends View {
 
     }
 
-    protected void init() {
-        //spinnerNum = MainActivity.numLocations;
-        //spinnerNum = 1;
-
-        setBackgroundResource(R.drawable.campus);
-
-        Log.v("GAME VIEW", "init");
-
+    /*
+     * This function sets the map points
+     */
+    protected void setMapPoints() {
         mapPoints = new Point[spinnerNum];
 
-        // yeah, I don't know what's going on here
+        /*
+         * spinnerNum number of points are chosen from predefined mapPositions(allowed points) at random
+         * and these are assigned to mapPoints to be shown in red for the game.
+         */
         Set set = new HashSet();
         Random rn = new Random();
         for (int i = 0; i < spinnerNum; i++) {
@@ -107,6 +106,14 @@ public class GameView extends View {
             set.add(randomNum);
             mapPoints[i] = mapPositions[randomNum];
         }
+    }
+    protected void init() {
+
+        setBackgroundResource(R.drawable.campus);
+
+        Log.v("GAME VIEW", "init");
+        setMapPoints();
+
     }
 
     /*
