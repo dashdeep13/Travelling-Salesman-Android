@@ -16,4 +16,10 @@ public class LineSegment {
 
     }
 
+    public static double distance(Point start,Point end) {
+        double dx = start.x - end.x;
+        double dy = start.y - end.y;
+        return Math.sqrt(dx*dx + dy*dy);
+    }
+
 }
