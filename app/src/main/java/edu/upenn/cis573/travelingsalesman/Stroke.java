@@ -38,22 +38,18 @@ public class Stroke {
         this.isValidStroke = isValidStroke;
     }
 
-    public Point getPointAtIndex(int i ) {
+    public Point get(int i ) {
         return strokeCoords.get(i);
     }
 
-    public int getStrokeSize() {
+    public int size() {
         return strokeCoords.size();
     }
 
-    public ArrayList<Point> getStrokeCoords() {
-        return strokeCoords;
-    }
-
-    public void addPoint(Point point) {
+    public void add(Point point) {
         strokeCoords.add(point);
     }
-    public void clearPoints() {
+    public void clear() {
         strokeCoords.clear();
     }
 

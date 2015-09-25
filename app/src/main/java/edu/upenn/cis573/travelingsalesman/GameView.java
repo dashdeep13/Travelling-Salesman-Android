@@ -17,13 +17,12 @@ import java.util.*;
 public class GameView extends View {
 
     protected Stroke stroke = new Stroke();
+    protected Segments segments = new Segments();
 
-    protected ArrayList<Point[]> segments = new ArrayList<Point[]>();
     private Point firstPoint;
     protected Point[] mapPoints;
     protected int spinnerNum;
     protected int attempt = 0;
-    protected boolean isValidStroke = false;
     protected static final Point[] mapPositions;
 
     // these points are all hardcoded to fit the UPenn campus map on a Nexus 5
@@ -123,12 +122,12 @@ public class GameView extends View {
         Paint paint = new Paint();
         // draws the stroke
         if (stroke.isValidStroke()) {
-            if (stroke.getStrokeSize() > 1) {
-                for (int i = 0; i < stroke.getStrokeSize()-1; i++) {
-                    int x1 = stroke.getPointAtIndex(i).x;
-                    int y1 = stroke.getPointAtIndex(i).y;
-                    int x2 = stroke.getPointAtIndex(i+1).x;
-                    int y2 = stroke.getPointAtIndex(i + 1).y;
+            if (stroke.size() > 1) {
+                for (int i = 0; i < stroke.size()-1; i++) {
+                    int x1 = stroke.get(i).x;
+                    int y1 = stroke.get(i).y;
+                    int x2 = stroke.get(i+1).x;
+                    int y2 = stroke.get(i + 1).y;
 
                     paint.setColor(stroke.color);
                     paint.setStrokeWidth(stroke.width);
@@ -139,10 +138,10 @@ public class GameView extends View {
 
         // draws the line segments
         for (int i = 0; i < segments.size(); i++) {
-            Point[] points = segments.get(i);
-            paint.setColor(Color.RED);
-            paint.setStrokeWidth(10);
-            canvas.drawLine(points[0].x, points[0].y, points[1].x, points[1].y, paint);
+            LineSegment line = segments.get(i);
+            paint.setColor(segments.color);
+            paint.setStrokeWidth(segments.width);
+            canvas.drawLine(line.start.x, line.start.y, line.end.x, line.end.y, paint);
         }
 
         // draws the points on the map
@@ -157,9 +156,10 @@ public class GameView extends View {
         // detects whether the segments form a circuit - but there's a bug!
         boolean isCircuit = true;
         HashMap<Point, Integer> connections = new HashMap<Point, Integer>();
-        for (Point[] pair : segments) {
-            Point p1 = pair[0];
-            Point p2 = pair[1];
+        for (int i = 0; i < segments.size(); i++) {
+            LineSegment line = segments.get(i);
+            Point p1 = line.start;
+            Point p2 = line.end;
             Integer value = connections.get(p1);
             if (value == null)
                 value = 0;
@@ -191,9 +191,10 @@ public class GameView extends View {
             double shortestPathLength = calculatePathDistance(shortestPath);
 
             double myPathLength = 0;
-            for (Point[] pair : segments) {
-                Point p1 = pair[0];
-                Point p2 = pair[1];
+            for (int i = 0; i < segments.size(); i++) {
+                LineSegment line = segments.get(i);
+                Point p1 = line.start;
+                Point p2 = line.end;
                 double dx = p1.x - p2.x;
                 double dy = p1.y - p2.y;
                 double dist = Math.sqrt(dx * dx + dy * dy);
@@ -215,14 +216,14 @@ public class GameView extends View {
                     for (int i = 0; i < shortestPath.size() - 1; i++) {
                         Point a = shortestPath.get(i);
                         Point b = shortestPath.get(i + 1);
-                        paint.setColor(Color.YELLOW);
-                        paint.setStrokeWidth(10);
+                        paint.setColor(stroke.color);
+                        paint.setStrokeWidth(stroke.width);
                         canvas.drawLine(a.x+10, a.y+10, b.x+10, b.y+10, paint);
                     }
                     Point a = shortestPath.get(shortestPath.size()-1);
                     Point b = shortestPath.get(0);
-                    paint.setColor(Color.YELLOW);
-                    paint.setStrokeWidth(10);
+                    paint.setColor(stroke.color);
+                    paint.setStrokeWidth(stroke.width);
                     canvas.drawLine(a.x+10, a.y+10, b.x+10, b.y+10, paint);
 
                     Toast.makeText(getContext(), "Nope, sorry! Here's the solution.", Toast.LENGTH_LONG).show();
@@ -264,23 +265,23 @@ public class GameView extends View {
                     // upper-left corner of the little red box but we want the center
                     p.x = mapPoints[i].x+10;
                     p.y = mapPoints[i].y+10;
-                    stroke.addPoint(p);
+                    stroke.add(p);
                     firstPoint = p;
                     stroke.setValidStroke(true);
-                    isValidStroke = true;
+                    segments.setValidStroke(true);
                     break;
                 }
             }
         }
         else if (event.getAction() == MotionEvent.ACTION_MOVE) {
             if (stroke.isValidStroke()) {
-                stroke.addPoint(p);
+                stroke.add(p);
             }
         }
         else if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (isValidStroke) {
+            if (segments.isValidStroke) {
 
-                stroke.clearPoints();
+                stroke.clear();
                 // only add the segment if the release point is within 30 of any of the other points
                 for (int i = 0; i < mapPoints.length; i++) {
                     double dx = p.x - mapPoints[i].x;
@@ -290,16 +291,18 @@ public class GameView extends View {
                     if (dist < 30) {
                         p.x = mapPoints[i].x + 10;
                         p.y = mapPoints[i].y + 10;
-                        Point[] points = {firstPoint, p};
+                        LineSegment line = new LineSegment();
+                        line.start = firstPoint;
+                        line.end = p;
 
                         if (firstPoint.x != p.x && firstPoint.y != p.y) {
-                            segments.add(points);
+                            segments.add(line);
                         }
                         break;
                     }
                 }
             }
-            isValidStroke = false;
+            segments.setValidStroke(false);
             stroke.setValidStroke(false);
         }
         else {
