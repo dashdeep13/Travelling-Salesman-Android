@@ -147,40 +147,11 @@ public class GameView extends View {
         for (int i = 0; i < mapPoints.length; i++) {
             int x = mapPoints[i].x;
             int y = mapPoints[i].y;
-            canvas.drawRect(x, y, x+20, y+20, paint);
+            canvas.drawRect(x, y, x + 20, y + 20, paint);
         }
 
-        // detects whether the segments form a circuit - but there's a bug!
-        boolean isCircuit = true;
-        HashMap<Point, Integer> connections = new HashMap<Point, Integer>();
-        for (int i = 0; i < segments.size(); i++) {
-            LineSegment line = segments.get(i);
-            Point p1 = line.start;
-            Point p2 = line.end;
-            Integer value = connections.get(p1);
-            if (value == null)
-                value = 0;
-            value++;
-            connections.put(p1, value);
-
-            value = connections.get(p2);
-            if (value == null)
-                value = 0;
-            value++;
-            connections.put(p2, value);
-        }
-
-        if (segments.size() == 0) {
-            isCircuit = false;
-        } else {
-            for (int v : connections.values()) {
-                if (v != 2) {
-                    isCircuit = false;
-                    break;
-                }
-            }
-        }
-
+        //checks if the segments form a circuit or not
+        boolean isCircuit = segments.isCircuit(mapPoints.length);
 
         // see if user has solved the problem
         if ((segments.size() == mapPoints.length) && isCircuit) {
